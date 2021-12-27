@@ -5,11 +5,7 @@
 
 <body>
     <article>
-        <h1><a href="post">My First Post</a></h1>
-
-        <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloribus, tenetur rem? Debitis, accusamus et magnam vitae voluptates deserunt, eligendi voluptas, quas sapiente tempora architecto mollitia possimus. Adipisci provident velit aspernatur.
-        </p>
+        <?= $post; ?>
     </article>
 
     <a href="/">Go Back</a>
