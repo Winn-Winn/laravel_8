@@ -9,9 +9,13 @@ use Spatie\YamlFrontMatter\YamlFrontMatter;
 class Post
 {
     public $title;
+
     public $excerpt;
+
     public $date;
+
     public $body;
+    
     public $slug;
 
     public function __construct($title, $excerpt, $date, $body, $slug)
@@ -34,7 +38,8 @@ class Post
                     $document->date,
                     $document->body(),
                     $document->slug,
-                ))->sortByDesc('date');
+                ))
+                ->sortByDesc('date');
         });
     }
 
@@ -42,5 +47,16 @@ class Post
     {
         // all of the blog posts, find the one with a slug that matches the one that was requested.
         return static::all()->firstWhere('slug', $slug);
+    }
+
+    public static function findOrFail($slug)
+    {
+        $post = static::find($slug);
+
+        if(!$post) {
+            throw new ModelNotFoundException();
+        }
+
+        return $post;
     }
 }
