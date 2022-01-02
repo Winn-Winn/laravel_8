@@ -9,9 +9,12 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
 use Spatie\YamlFrontMatter\YamlFrontMatter;
 
-Route::get('ping', function() {
+Route::post('newsletter', function() {
+    request()->validate(['email' => 'required|email']);
+    
     $mailchimp = new \MailchimpMarketing\ApiClient();
 
     $mailchimp->setConfig([
@@ -19,11 +22,18 @@ Route::get('ping', function() {
         'server' => 'us20'
     ]);
     
-    $response = $mailchimp->lists->addListMember("9bc6a09a4a", [
-        "email_address" => "Lindsey.White93@hotmail.com",
-        "status" => "subscribed",
-    ]);
-    ddd($response);
+    try {
+        $response = $mailchimp->lists->addListMember("9bc6a09a4a", [
+            "email_address" => request('email'),
+            "status" => "subscribed",
+        ]);
+    } catch (\Exception $e) {
+        throw ValidationException::withMessages([
+            'email' => 'This email cound not be added to our newletter'
+        ]);
+    }
+    
+    return redirect('/')->with('success', 'You are now signed up for our newsletter! ');
 });
 
 Route::get('/', [PostController::class, 'index'])->name('home');
