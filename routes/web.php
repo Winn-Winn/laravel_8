@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PostCommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RegisterController;
@@ -7,39 +8,18 @@ use App\Http\Controllers\SessionController;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\User;
+use App\Services\Newsletter;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Spatie\YamlFrontMatter\YamlFrontMatter;
 
-Route::post('newsletter', function() {
-    request()->validate(['email' => 'required|email']);
-    
-    $mailchimp = new \MailchimpMarketing\ApiClient();
-
-    $mailchimp->setConfig([
-        'apiKey' => config('services.mailchimp.key'),
-        'server' => 'us20'
-    ]);
-    
-    try {
-        $response = $mailchimp->lists->addListMember("9bc6a09a4a", [
-            "email_address" => request('email'),
-            "status" => "subscribed",
-        ]);
-    } catch (\Exception $e) {
-        throw ValidationException::withMessages([
-            'email' => 'This email cound not be added to our newletter'
-        ]);
-    }
-    
-    return redirect('/')->with('success', 'You are now signed up for our newsletter! ');
-});
-
 Route::get('/', [PostController::class, 'index'])->name('home');
 
 Route::get('posts/{post:slug}', [PostController::class, 'show']);
 Route::post('posts/{post:slug}/comments', [PostCommentController::class, 'store']);
+
+Route::post('newsletter', NewsletterController::class);
 
 Route::get('register', [RegisterController::class, 'create'])->middleware('guest');
 Route::post('register', [RegisterController::class, 'store'])->middleware('guest');
